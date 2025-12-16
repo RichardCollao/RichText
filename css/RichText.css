@@ -1,0 +1,251 @@
+/**
+ * RichText Editor Styles
+ */
+
+.rich-text-toolbar {
+  background-color: #f8f9fa;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.rich-text-content {
+  overflow-y: auto;
+  word-wrap: break-word;
+}
+
+.rich-text-content:empty:before {
+  content: attr(data-placeholder);
+  color: #6c757d;
+  pointer-events: none;
+}
+
+.rich-text-content:focus {
+  box-shadow: none;
+}
+
+/* Fullscreen mode */
+.rich-text-editor.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  margin: 0;
+  border-radius: 0 !important;
+}
+
+/* Link styles in editor */
+.rich-text-content a {
+  color: #0d6efd;
+  text-decoration: underline;
+}
+
+/* Video container for responsive YouTube embeds */
+.rich-text-content .video-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* Aspect ratio 16:9 */
+  height: 0;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+
+.rich-text-content .video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Image styles in editor */
+.rich-text-content img {
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
+  margin: 0.5rem 0;
+  -webkit-user-drag: none;
+  -moz-user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Floating image resize overlay (no wrapper in DOM) */
+.rich-text-resize-overlay {
+  position: absolute;
+  border: 2px solid #0d6efd;
+  box-sizing: border-box;
+  z-index: 10000;
+  pointer-events: none; /* solo los handles reciben eventos */
+}
+
+.rich-text-resize-handle {
+  position: absolute;
+  background: #0d6efd;
+  border: 2px solid white;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+  pointer-events: auto;
+}
+
+/* Corner handles */
+.rich-text-resize-handle.handle-nw,
+.rich-text-resize-handle.handle-ne,
+.rich-text-resize-handle.handle-sw,
+.rich-text-resize-handle.handle-se {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+/* Edge handles */
+.rich-text-resize-handle.handle-n,
+.rich-text-resize-handle.handle-s {
+  width: 10px;
+  height: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.rich-text-resize-handle.handle-e,
+.rich-text-resize-handle.handle-w {
+  width: 6px;
+  height: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Handle positions */
+.rich-text-resize-handle.handle-nw {
+  top: -5px;
+  left: -5px;
+  cursor: nw-resize;
+}
+
+.rich-text-resize-handle.handle-ne {
+  top: -5px;
+  right: -5px;
+  cursor: ne-resize;
+}
+
+.rich-text-resize-handle.handle-sw {
+  bottom: -5px;
+  left: -5px;
+  cursor: sw-resize;
+}
+
+.rich-text-resize-handle.handle-se {
+  bottom: -5px;
+  right: -5px;
+  cursor: se-resize;
+}
+
+.rich-text-resize-handle.handle-n {
+  top: -3px;
+  cursor: n-resize;
+}
+
+.rich-text-resize-handle.handle-s {
+  bottom: -3px;
+  cursor: s-resize;
+}
+
+.rich-text-resize-handle.handle-e {
+  right: -3px;
+  cursor: e-resize;
+}
+
+.rich-text-resize-handle.handle-w {
+  left: -3px;
+  cursor: w-resize;
+}
+
+/* List styles */
+.rich-text-content ul,
+.rich-text-content ol {
+  padding-left: 2rem;
+}
+
+/* Code view - removed as it's no longer needed */
+
+/* Textarea for source code view */
+.rich-text-source {
+  font-family: "Courier New", Consolas, Monaco, monospace;
+  line-height: 1.5;
+  tab-size: 4;
+  -moz-tab-size: 4;
+}
+
+.rich-text-source:focus {
+  background-color: #ffffff;
+}
+
+/* Color picker styling */
+.rich-text-color-picker {
+  cursor: pointer;
+}
+
+/* Font size and font selector */
+.rich-text-font-selector,
+.rich-text-size-selector {
+  max-width: 120px;
+  cursor: pointer;
+}
+
+.rich-text-toolbar {
+  gap: 0.25rem !important;
+}
+
+.rich-text-btn {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 !important;
+}
+
+.rich-text-btn-icon {
+  font-size: 1.4rem;
+  margin: 0 !important;
+}
+
+.vr {
+  display: none;
+}
+
+/* Scrollbar styling */
+.rich-text-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.rich-text-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.rich-text-content::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.rich-text-content::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+
+
+/* Estilos para contenedores de video embebidos */
+.video-container {
+  width: 100%;
+  max-width: 100%; /* opcional */
+}
+
+.video-container iframe {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  display: block;
+}

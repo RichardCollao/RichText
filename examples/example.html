@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <title>..:: RichText Editor - Demo ::..</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+    <!-- RichText CSS -->
+    <link type="text/css" rel="stylesheet" href="../css/RichText.css" />
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="demo-card">
+            <h1 class="demo-title">RichText Editor - Demo</h1>
+            <p class="text-muted">Un editor WYSIWYG simple y funcional</p>
+        </div>
+
+        <div class="demo-card">
+            <h3 class="demo-title">Editor</h3>
+            <div id="editor" style="height: 500px; overflow: scroll;"></div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="../js/RichText.js"></script>
+
+    <script>
+
+        let richTextEditor;
+
+        let contenido = '';
+        document.addEventListener('DOMContentLoaded', (event) => {
+            richTextEditor = new RichText('editor', {
+                height: '500px',
+                placeholder: 'Escribe algo aquí...'
+            });
+        });
+
+        function getContent() {
+            contenido = richTextEditor.editor.innerHTML;
+            console.log('contenido :>> ', contenido);
+            document.getElementById('output').value = contenido; //contenido.replaceAll('<br>', '\r\n');
+        }
+
+        function setContent() {
+            let exampleContent = [
+                '<h2>¡Bienvenido a RichText Editor!</h2>',
+                '<p>Este es un <strong>ejemplo</strong> de contenido con <em>formato</em>.</p>',
+                '   <ul>',
+                '    <li>Negrita, cursiva y subrayado</li>',
+                '    <li>Listas ordenadas y desordenadas</li>',
+                '    <li>Enlaces e imágenes</li>',
+                '</ul>',
+                '<p style="text-align: center;">Texto centrado con <span style="color: rgb(13, 110, 253);">colores</span></p>',
+                '<blockquote>Este es un ejemplo de cita o bloque de texto importante.</blockquote>'
+            ].join('\n');
+
+            console.log('exampleContent :>> ', exampleContent);
+            richTextEditor.editor.innerHTML = exampleContent;
+
+            // console.log('codigo :>> ', exampleContent);
+            // richTextEditor.editor.innerHTML = exampleContent.replaceAll('\r\n', '<br>');
+        }
+
+        function clearEditor() {
+            richTextEditor.editor.innerHTML = '';
+        }
+
+        function test() {
+            console.log('Test function called');
+            richTextEditor.editor.contentEditable = false;
+        }
+    </script>
+</body>
+
+</html>
