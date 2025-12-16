@@ -125,12 +125,6 @@ new RichText('containerId', {
 // La imagen se inserta y puede redimensionarse haciendo clic sobre ella
 ```
 
-**Redimensionamiento de imágenes:**
-- Haz clic en cualquier imagen del editor
-- Aparecerá un overlay flotante con 8 handles de redimensionamiento
-- Arrastra los handles para cambiar el tamaño
-- La tecla Enter está bloqueada mientras la imagen está seleccionada
-- Haz clic fuera para deseleccionar
 
 #### Videos de YouTube
 
@@ -198,29 +192,9 @@ python3 -m http.server 8000
 # Abre http://localhost:8000/example.html
 ```
 
-## Notas técnicas
-
-### Redimensionamiento de imágenes
-
-El sistema de redimensionamiento utiliza un overlay flotante que:
-- No modifica el DOM de la imagen original
-- Se posiciona absolutamente sobre la imagen seleccionada
-- Se actualiza automáticamente con scroll y resize de ventana
-- No deja elementos residuales al deseleccionar
-
-### Videos de YouTube
-
-Los videos se insertan en un contenedor responsive con aspect ratio 16:9. Requieren servirse desde un servidor HTTP/HTTPS (no funcionan con protocolo `file://`).
-
 ### Compatibilidad
 
 El editor utiliza `document.execCommand()` para la mayoría de operaciones de formato. Funciona en navegadores modernos pero esta API está siendo reemplazada gradualmente por alternativas más modernas.
-
-## Limitaciones conocidas
-
-- `document.execCommand()` está deprecada (funcional pero legacy)
-- Los videos de YouTube requieren servirse desde servidor HTTP
-- El pegado de contenido se limita a texto plano para evitar formato no deseado
 
 ## Contribuir
 
