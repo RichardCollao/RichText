@@ -41,7 +41,10 @@
         document.addEventListener('DOMContentLoaded', (event) => {
             richTextEditor = new RichText('editor', {
                 height: '500px',
-                placeholder: 'Escribe algo aquí...'
+                placeholder: 'Escribe algo aquí...',
+                emojiSet: 'custom',
+                customEmojiPath: '../emoticons/',
+                customEmojiList: '../emoticons/emojis.json'
             });
         });
 

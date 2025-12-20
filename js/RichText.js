@@ -13,6 +13,9 @@ class RichText {
         this.options = {
             height: options.height || '400px',
             placeholder: options.placeholder || 'Escribe algo...',
+            emojiSet: options.emojiSet || 'default', // 'default' o 'custom'
+            customEmojiPath: options.customEmojiPath || 'icons/', // ruta a emojis personalizados
+            customEmojiList: options.customEmojiList || null, // ruta al archivo JSON con la lista de emojis
             ...options
         };
 
@@ -21,6 +24,8 @@ class RichText {
         // Datos para overlay de redimensionado basado en overlay flotante
         this.imageResizeOverlay = null; // overlay único por editor
         this.resizeData = null; // datos de drag actuales
+        this.emojiPopover = null; // popover de emojis
+        this.customEmojis = null; // cache de emojis personalizados cargados desde JSON
         this.init();
     }
 
@@ -59,6 +64,7 @@ class RichText {
                 ${this.createButton('strikethrough', 'bi-type-strikethrough', 'Tachado')}
                 ${this.createDivider()}
                 ${this.createColorPicker('foreColor', 'bi-palette', 'Color de texto')}
+                ${this.createButton('emoji', 'bi-emoji-smile', 'Insertar emoji')}
                 ${this.createDivider()}
                 ${this.createButton('link', 'bi-link-45deg', 'Insertar enlace')}
                 ${this.createButton('image', 'bi-image', 'Insertar imagen')}
@@ -205,6 +211,15 @@ class RichText {
                 const command = e.target.dataset.command;
                 this.executeCommand(command, e.target.value);
             });
+        });
+
+        // Click fuera del popover de emojis para cerrarlo
+        document.addEventListener('click', (e) => {
+            if (this.emojiPopover &&
+                !e.target.closest('.emoji-popover') &&
+                !e.target.closest('[data-command="emoji"]')) {
+                this.closeEmojiPopover();
+            }
         });
 
         // Prevenir pérdida de foco (excepto para selectores e inputs)
@@ -494,19 +509,19 @@ class RichText {
         if (url) {
             // Extraer el ID del video de YouTube de diferentes formatos de URL
             let videoId = null;
-            
+
             // Formato: https://www.youtube.com/watch?v=VIDEO_ID
             const watchMatch = url.match(/[?&]v=([^&]+)/);
             if (watchMatch) {
                 videoId = watchMatch[1];
             }
-            
+
             // Formato: https://youtu.be/VIDEO_ID
             const shortMatch = url.match(/youtu\.be\/([^?]+)/);
             if (shortMatch) {
                 videoId = shortMatch[1];
             }
-            
+
             // Formato: https://www.youtube.com/embed/VIDEO_ID
             const embedMatch = url.match(/youtube\.com\/embed\/([^?]+)/);
             if (embedMatch) {
@@ -527,13 +542,170 @@ class RichText {
                         </iframe>
                     </div>
                 `;
-                
+
                 // Insertar el HTML en el editor
                 document.execCommand('insertHTML', false, videoHTML);
             } else {
                 alert('Error: URL de YouTube no válida. Por favor, usa un formato como:\n- https://www.youtube.com/watch?v=VIDEO_ID\n- https://youtu.be/VIDEO_ID');
             }
         }
+    }
+
+    getEmojiList() {
+        if (this.options.emojiSet === 'custom') {
+            // Si ya tenemos los emojis cargados en cache, retornarlos
+            if (this.customEmojis) {
+                return this.customEmojis;
+            }
+
+            // Si no hay lista personalizada configurada, retornar array vacío
+            if (!this.options.customEmojiList) {
+                console.warn('RichText: customEmojiList no está configurado. Usa la opción customEmojiList para especificar la ruta del archivo JSON.');
+                return [];
+            }
+
+            // Retornar array vacío temporalmente, los emojis se cargarán de forma asíncrona
+            return [];
+        } else {
+            // Emojis Unicode por defecto
+            return [
+                '😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '😉', '😊',
+                '😇', '🥰', '😍', '🤩', '😘', '😗', '😚', '😙', '😋', '😛', '😜', '🤪',
+                '😝', '🤑', '🤗', '🤭', '🤫', '🤔', '🤐', '🤨', '😐', '😑', '😶', '😏',
+                '😒', '🙄', '😬', '🤥', '😌', '😔', '😪', '🤤', '😴', '😷', '🤒', '🤕',
+                '🤢', '🤮', '🤧', '🥵', '🥶', '😵', '🤯', '🤠', '🥳', '😎', '🤓', '🧐',
+                '😕', '😟', '🙁', '😮', '😯', '😲', '😳', '🥺', '😦', '😧', '😨', '😰',
+                '😥', '😢', '😭', '😱', '😖', '😣', '😞', '😓', '😩', '😫', '🥱', '😤',
+                '😡', '😠', '🤬', '👍', '👎', '👌', '✌️', '🤞', '🤟', '🤘', '🤙', '👈',
+                '👉', '👆', '👇', '☝️', '👋', '🤚', '🖐️', '✋', '🖖', '👏', '🙌', '👐',
+                '🤲', '🤝', '🙏', '✍️', '💅', '🤳', '💪', '🦾', '🦿', '🦵', '🦶', '👂',
+                '🦻', '👃', '🧠', '🦷', '🦴', '👀', '👁️', '👅', '👄', '💋', '❤️', '🧡',
+                '💛', '💚', '💙', '💜', '🤎', '🖤', '🤍', '💔', '❣️', '💕', '💞', '💓',
+                '💗', '💖', '💘', '💝', '💟', '☮️', '✝️', '☪️', '🕉️', '☸️', '✡️', '🔯',
+                '🕎', '☯️', '☦️', '🛐', '⛎', '♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏',
+                '♐', '♑', '♒', '♓', '🆔', '⚛️', '🉑', '☢️', '☣️', '📴', '📳', '🈶',
+                '🈚', '🈸', '🈺', '🈷️', '✴️', '🆚', '💮', '🉐', '㊙️', '㊗️', '🈴', '🈵',
+                '🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '🟤', '⚫', '⚪', '🟥', '🟧', '🟨',
+                '🟩', '🟦', '🟪', '🟫', '⬛', '⬜', '◼️', '◻️', '◾', '◽', '▪️', '▫️',
+                '🔶', '🔷', '🔸', '🔹', '🔺', '🔻', '💠', '🔘', '🔳', '🔲', '⭐', '🌟',
+                '✨', '⚡', '💥', '🔥', '🌈', '☀️', '🌤️', '⛅', '🌥️', '☁️', '🌦️', '🌧️'
+            ];
+        }
+    }
+
+    async loadCustomEmojis() {
+        if (!this.options.customEmojiList) {
+            return [];
+        }
+
+        try {
+            const response = await fetch(this.options.customEmojiList);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const emojis = await response.json();
+            this.customEmojis = emojis;
+            return emojis;
+        } catch (error) {
+            console.error('RichText: Error al cargar emojis personalizados:', error);
+            return [];
+        }
+    }
+
+    async toggleEmojiPopover() {
+        console.log('RichText: toggleEmojiPopover');
+
+        if (this.emojiPopover) {
+            this.closeEmojiPopover();
+            return;
+        }
+
+        // Cargar emojis personalizados si es necesario
+        let emojis;
+        if (this.options.emojiSet === 'custom' && !this.customEmojis) {
+            emojis = await this.loadCustomEmojis();
+        } else {
+            emojis = this.getEmojiList();
+        }
+
+        // Si no hay emojis, no mostrar el popover
+        if (!emojis || emojis.length === 0) {
+            alert('No se pudieron cargar los emojis. Verifica la configuración.');
+            return;
+        }
+
+        const emojiBtn = this.toolbar.querySelector('[data-command="emoji"]');
+        const rect = emojiBtn.getBoundingClientRect();
+
+        // Crear popover
+        const popover = document.createElement('div');
+        popover.className = 'emoji-popover';
+
+        // Crear tabla de emojis (4 columnas)
+        let emojiTable = '<div class="emoji-grid">';
+
+        if (this.options.emojiSet === 'custom') {
+            // Emojis personalizados como imágenes
+            emojis.forEach((emoji) => {
+                emojiTable += `<button type="button" class="emoji-btn" data-emoji="${emoji.code}">
+                    <img src="${this.options.customEmojiPath}${emoji.file}" alt="${emoji.code}" class="custom-emoji-icon">
+                </button>`;
+            });
+        } else {
+            // Emojis Unicode por defecto
+            emojis.forEach((emoji) => {
+                emojiTable += `<button type="button" class="emoji-btn" data-emoji="${emoji}">${emoji}</button>`;
+            });
+        }
+        emojiTable += '</div>';
+
+        popover.innerHTML = emojiTable;
+
+        // Posicionar debajo del botón
+        popover.style.position = 'absolute';
+        popover.style.left = rect.left + window.scrollX + 'px';
+        popover.style.top = rect.bottom + window.scrollY + 'px';
+
+        document.body.appendChild(popover);
+        this.emojiPopover = popover;
+
+        // Eventos de clic en emojis
+        popover.querySelectorAll('.emoji-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const emoji = btn.dataset.emoji;
+                this.insertEmoji(emoji);
+            });
+        });
+    }
+
+    closeEmojiPopover() {
+        if (this.emojiPopover) {
+            this.emojiPopover.remove();
+            this.emojiPopover = null;
+        }
+    }
+
+    insertEmoji(emoji) {
+        console.log('RichText: insertEmoji', emoji);
+
+        if (this.options.emojiSet === 'custom') {
+            // Insertar emoji personalizado como imagen
+            const emojiList = this.getEmojiList();
+            const emojiData = emojiList.find(e => e.code === emoji);
+
+            if (emojiData) {
+                const imgHTML = `<img src="${this.options.customEmojiPath}${emojiData.file}" alt="${emoji}" class="custom-emoji-inline" title="${emoji}">`;
+                document.execCommand('insertHTML', false, imgHTML);
+            }
+        } else {
+            // Insertar emoji Unicode
+            document.execCommand('insertText', false, emoji);
+        }
+
+        this.closeEmojiPopover();
+        this.editor.focus();
     }
 
     toggleFullscreen() {
@@ -563,6 +735,7 @@ class RichText {
             link: () => this.insertLink(),
             image: () => this.insertImage(),
             youtube: () => this.insertYouTube(),
+            emoji: () => this.toggleEmojiPopover(),
             alignLeft: () => document.execCommand('justifyLeft', false, null),
             alignCenter: () => document.execCommand('justifyCenter', false, null),
             alignRight: () => document.execCommand('justifyRight', false, null),
